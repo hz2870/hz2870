@@ -1,7 +1,7 @@
 #---------------------Qeustion 1: Who Am I
 
 def WhoAmI():
-    return('wx2297')
+    return('hz2870')
 
 
 #--------------------Question 2: getBondPrice
