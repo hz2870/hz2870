@@ -1,46 +1,60 @@
-# Question 1: Who Am I
+#---------------------Qeustion 1: Who Am I
+
 def WhoAmI():
-    return 'hz2870'
+    return('wx2297')
 
 
-# Question 2: getBondPrice
-# Version 1
-def getBondPrice_v1(y, face, couponRate, m, ppy=1):
-    cf = couponRate * face / ppy
-    n = m * ppy
-    y1 = y / ppy
-
-    pvcf = 0
-    for t in range(1, n+1):
-        pvcf += cf / ((1 + y1) ** t)
-
-    pv_f = face / ((1 + y1) ** n)
-
-    bondPrice = pvcf + pv_f
-    return bondPrice
+#--------------------Question 2: getBondPrice
 
 
-# Version 2
-def getBondPrice_v2(y, face, couponRate, m, ppy=1):
+def getBondPrice(y, face, couponRate, m, ppy=1):
     bondPrice = 0
     coupon = face * couponRate / ppy
-    for i in range(1, m*ppy+1):
+    numberCoupon = m * ppy
+    for t in range(1, numberCoupon+1):
+        dcf = 1/(1+y/ppy)**t
+        bondPrice += dcf * coupon
+    bondPrice += face * dcf
+    
+    return(bondPrice)
+
+# method 2
+
+def getBondPrice(y, face, couponRate, m, ppy=1):
+    bondPrice = 0
+    coupon = face * couponRate / ppy    
+    for i in range(1,m*ppy+1):
         if i < m*ppy:
             cashflow = coupon
         else:
             cashflow = coupon + face
-        dcf = 1 / (1 + y / ppy) ** i
-        bondPrice += dcf * cashflow
-    return bondPrice
+        dcf = 1/(1+y/ppy)**i
+        bondPrice += dcf * cashflow        
+    return(bondPrice)
+
+# Test values
+
+y = 0.03
+face = 2000000
+couponRate = 0.04
+m = 10
+#ppy = 1
+ppy = 2
+#<no ppy value passed>
+getBondPrice(y, face, couponRate, m, ppy)
 
 
-# Question 3: getBondDuration
-# Version 1
-def getBondDuration_v1(y, face, couponRate, m, ppy=1):
+#--------------------Qestion 3: getBondDuration
+
+
+def getBondDuration(y, face, couponRate, m, ppy=1):
+
     couponPayment = face * couponRate
+
     pvcf = 0
     w_pvcf = 0
-    for t in range(1, 1 + m):
+
+    for t in range(1, 1+m):
         pv = 1 / (1 + y)**t
         cashFlow = couponPayment if t < m else couponPayment + face
         pvCashFlow = pv * cashFlow
@@ -48,45 +62,127 @@ def getBondDuration_v1(y, face, couponRate, m, ppy=1):
         w_pvcf += pvCashFlow * t
 
     duration = w_pvcf / pvcf
-    return duration
+    return (duration)
 
-
-# Version 2
-def getBondDuration_v2(y, face, couponRate, m, ppy=1):
+# method 2
+def getBondDuration(y, face, couponRate, m, ppy = 1):
     bondDuration = 0
+    
     coupon = face * couponRate / ppy
+    
     pvcf = 0
     pvcf_t = 0
     
-    for i in range(1, m * ppy + 1):
-        dcf = 1 / (1 + y / ppy) ** i
-        cashflow = coupon if i < m * ppy else coupon + face
+    for i in range (1, m*ppy+1):
+        dcf = 1/(1+y/ppy)**i
+        if i < m*ppy:
+            cashflow = coupon 
+        else:
+            cashflow = coupon + face
         pvcf += dcf * cashflow
         pvcf_t += i * dcf * cashflow
 
-    bondDuration = pvcf_t / pvcf
-    return bondDuration
-
+    
+    bondDuration = pvcf_t/pvcf
+    
+    return(bondDuration)
 
 # Test values
+
 y = 0.03
 face = 2000000
 couponRate = 0.04
 m = 10
-ppy = 2
-
-# Testing the bond price functions
-bondPrice_v1 = getBondPrice_v1(y, face, couponRate, m, ppy)
-bondPrice_v2 = getBondPrice_v2(y, face, couponRate, m, ppy)
-
-# Testing the bond duration functions
-duration_v1 = getBondDuration_v1(y, face, couponRate, m, ppy)
-duration_v2 = getBondDuration_v2(y, face, couponRate, m, ppy)
+ppy = 1
+getBondDuration(y, face, couponRate, m, ppy = 1)
 
 
-# Question 6: FizzBuzz
-# Version 1
-def FizzBuzz_v1(start, finish):
+
+#---------------------Question 4: getBondPrice_Enumerate
+
+
+
+def getBondPrice_E(face, couponRate, m, yc):
+    bondPrice = 0
+    coupon = face * couponRate
+    m = len(yc)
+
+    for t, y in enumerate(yc, start=1):
+        pv_factor = 1 / (1 + y)**t
+        if t < m:
+            cashFlow = coupon
+        else:
+            cashFlow = coupon + face
+        pv_cashFlow = cashFlow * pv_factor
+        bondPrice += pv_cashFlow
+
+    return bondPrice
+
+# method 2
+
+def getBondPrice_E(face, couponRate, m, yc):
+    bondPrice = 0
+    coupon = face * couponRate
+
+    for a, b in enumerate(yc):
+        if a < m-1:
+            cashflow = coupon
+        else:
+            cashflow = coupon + face
+        dcf = 1 / (1 + b) ** (a + 1)  # Correcting the discount factor exponentiation
+        bondPrice += dcf * cashflow
+
+    return bondPrice
+
+# Test values
+yc = [0.010, 0.015, 0.020, 0.025, 0.030]
+face = 2000000
+couponRate = 0.04
+m = 5
+getBondPrice_E(face, couponRate, m, yc)
+
+
+
+#----------------------- Question 5: getBondPrice_Zip
+
+def getBondPrice_Z(face, couponRate, times, yc):
+    cpn = couponRate * face
+    bondPrice = 0
+    for y, t in zip(yc, times):
+        dfn = 1 / ((1+y)**t)
+        bondPrice += dfn * cpn
+    bondPrice += face * dfn
+    return(bondPrice)
+
+# method 2
+
+def getBondPrice_Z(face, couponRate, times, yc):
+    bondPrice = 0
+    coupon = face * couponRate
+    
+    for a, b in zip(yc, times):
+        if b != times[-1]:
+            cashflow = coupon
+        else:
+            cashflow = coupon + face
+        dcf = 1/(1+a)**b
+        bondPrice += dcf * cashflow
+                
+        
+    return(bondPrice)
+
+
+# Test values
+yc = [0.010, 0.015, 0.020, 0.025, 0.030]
+times = [1, 1.5, 3, 4, 7]
+face = 2000000
+couponRate = 0.04
+getBondPrice_Z(face, couponRate, times, yc)
+
+
+#-------------------------- Question 6: FizzBuzz
+
+def FizzBuzz(start, finish):
     outlist = []
     for i in range(start, finish + 1):
         if i % 3 == 0 and i % 5 == 0:
@@ -99,25 +195,25 @@ def FizzBuzz_v1(start, finish):
             outlist.append(i)
     return outlist
 
-
-# Version 2
-def FizzBuzz_v2(start, finish):
+####
+def FizzBuzz(start, finish):
     out = []
-    for i in range(start, finish + 1):
-        if i % 15 == 0:
+    for i in range(start, finish+1):
+        if i%15 == 0:
             out.append('FizzBuzz')
-        elif i % 3 == 0:
+        elif i%3 == 0:
             out.append('Fizz')
-        elif i % 5 == 0:
+        elif i%5 == 0:
             out.append('Buzz')
         else:
             out.append(i)
-    return out
+    return(out)
 
+FizzBuzz(1, 15)
+# Test the function with start = 1 and finish = 15
+start = 1
+finish = 15
+result = FizzBuzz(start, finish)
+print(result)
 
-# Test FizzBuzz
-fizzbuzz_v1 = FizzBuzz_v1(1, 15)
-fizzbuzz_v2 = FizzBuzz_v2(1, 15)
-
-# Outputs
-(bondPrice_v1, bondPrice_v2, duration_v1, duration_v2, fizzbuzz_v1, fizzbuzz_v2)
+FizzBuzz(start, finish)
