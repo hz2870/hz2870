@@ -1,44 +1,40 @@
-#---------------------Question 1: Who Am I
+# Question 1: Who Am I
 def WhoAmI():
-    return('hz2870')
+    return 'hz2870'
 
 
-#--------------------Question 2: getBondPrice
+# Question 2: getBondPrice
 # Version 1
-# Bond price calculation
 def getBondPrice_v1(y, face, couponRate, m, ppy=1):
-    """
-    Calculate the bond price based on input parameters.
-
-    y: Yield or interest rate
-    face: Face value of the bond
-    couponRate: Annual coupon rate
-    m: Number of years to maturity
-    ppy: Payments per year (default: 1)
-    """
-    # Calculate coupon payment
     cf = couponRate * face / ppy
-    # Total number of periods
     n = m * ppy
-    # Yield per period
     y1 = y / ppy
 
-    # Initialize present value of coupon payments
     pvcf = 0
-    for t in range(1, n + 1):
+    for t in range(1, n+1):
         pvcf += cf / ((1 + y1) ** t)
 
-    # Calculate present value of face value
     pv_f = face / ((1 + y1) ** n)
 
-    # Calculate total bond price
     bondPrice = pvcf + pv_f
-
     return bondPrice
 
 
+# Version 2
+def getBondPrice_v2(y, face, couponRate, m, ppy=1):
+    bondPrice = 0
+    coupon = face * couponRate / ppy
+    for i in range(1, m*ppy+1):
+        if i < m*ppy:
+            cashflow = coupon
+        else:
+            cashflow = coupon + face
+        dcf = 1 / (1 + y / ppy) ** i
+        bondPrice += dcf * cashflow
+    return bondPrice
 
-#--------------------Question 3: getBondDuration
+
+# Question 3: getBondDuration
 # Version 1
 def getBondDuration_v1(y, face, couponRate, m, ppy=1):
     couponPayment = face * couponRate
@@ -53,6 +49,7 @@ def getBondDuration_v1(y, face, couponRate, m, ppy=1):
 
     duration = w_pvcf / pvcf
     return duration
+
 
 # Version 2
 def getBondDuration_v2(y, face, couponRate, m, ppy=1):
@@ -70,67 +67,24 @@ def getBondDuration_v2(y, face, couponRate, m, ppy=1):
     bondDuration = pvcf_t / pvcf
     return bondDuration
 
+
 # Test values
+y = 0.03
+face = 2000000
+couponRate = 0.04
+m = 10
+ppy = 2
+
+# Testing the bond price functions
+bondPrice_v1 = getBondPrice_v1(y, face, couponRate, m, ppy)
+bondPrice_v2 = getBondPrice_v2(y, face, couponRate, m, ppy)
+
+# Testing the bond duration functions
 duration_v1 = getBondDuration_v1(y, face, couponRate, m, ppy)
 duration_v2 = getBondDuration_v2(y, face, couponRate, m, ppy)
 
 
-#--------------------Question 4: getBondPrice_Enumerate
-# Version 1
-def getBondPrice_E_v1(face, couponRate, m, yc):
-    bondPrice = 0
-    coupon = face * couponRate
-    for t, y in enumerate(yc, start=1):
-        pv_factor = 1 / (1 + y) ** t
-        cashFlow = coupon if t < m else coupon + face
-        bondPrice += cashFlow * pv_factor
-
-    return bondPrice
-
-# Version 2
-def getBondPrice_E_v2(face, couponRate, m, yc):
-    bondPrice = 0
-    coupon = face * couponRate
-    for a, b in enumerate(yc):
-        cashflow = coupon if a < m - 1 else coupon + face
-        dcf = 1 / (1 + b) ** (a + 1)
-        bondPrice += dcf * cashflow
-    return bondPrice
-
-# Test values
-yc = [0.010, 0.015, 0.020, 0.025, 0.030]
-bondPrice_E_v1 = getBondPrice_E_v1(face, couponRate, m, yc)
-bondPrice_E_v2 = getBondPrice_E_v2(face, couponRate, m, yc)
-
-
-#--------------------Question 5: getBondPrice_Zip
-# Version 1
-def getBondPrice_Z_v1(face, couponRate, times, yc):
-    cpn = couponRate * face
-    bondPrice = 0
-    for y, t in zip(yc, times):
-        dfn = 1 / ((1 + y) ** t)
-        bondPrice += dfn * cpn
-    bondPrice += face * dfn
-    return bondPrice
-
-# Version 2
-def getBondPrice_Z_v2(face, couponRate, times, yc):
-    bondPrice = 0
-    coupon = face * couponRate
-    for a, b in zip(yc, times):
-        cashflow = coupon if b != times[-1] else coupon + face
-        dcf = 1 / (1 + a) ** b
-        bondPrice += dcf * cashflow
-    return bondPrice
-
-# Test values
-times = [1, 1.5, 3, 4, 7]
-bondPrice_Z_v1 = getBondPrice_Z_v1(face, couponRate, times, yc)
-bondPrice_Z_v2 = getBondPrice_Z_v2(face, couponRate, times, yc)
-
-
-#--------------------Question 6: FizzBuzz
+# Question 6: FizzBuzz
 # Version 1
 def FizzBuzz_v1(start, finish):
     outlist = []
@@ -144,6 +98,7 @@ def FizzBuzz_v1(start, finish):
         else:
             outlist.append(i)
     return outlist
+
 
 # Version 2
 def FizzBuzz_v2(start, finish):
@@ -159,9 +114,12 @@ def FizzBuzz_v2(start, finish):
             out.append(i)
     return out
 
-# Test values
+
+# Test FizzBuzz
 fizzbuzz_v1 = FizzBuzz_v1(1, 15)
 fizzbuzz_v2 = FizzBuzz_v2(1, 15)
 
-(bondPrice_v1, bondPrice_v2, duration_v1, duration_v2, bondPrice_E_v1, bondPrice_E_v2, bondPrice_Z_v1, bondPrice_Z_v2, fizzbuzz_v1, fizzbuzz_v2)
+# Outputs
+(bondPrice_v1, bondPrice_v2, duration_v1, duration_v2, fizzbuzz_v1, fizzbuzz_v2)
+
 
